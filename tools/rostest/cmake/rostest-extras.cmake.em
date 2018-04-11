@@ -76,13 +76,22 @@ function(_add_rostest_google_test type target launch_file)
     message(FATAL_ERROR "add_rostest_${type}() needs at least one file argument to compile a ${type_upper} executable")
   endif()
   if(${type_upper}_FOUND)
+    # pull out parameters to used for add_rostest
+    cmake_parse_arguments(_rostest_gtest "" "WORKING_DIRECTORY" "ARGS" ${ARGN})
+    set(FILES_TO_ADD ${_rostest_gtest_UNPARSED_ARGUMENTS})
+    # compile gtest
     include_directories(${${type_upper}_INCLUDE_DIRS})
     add_executable(${target} EXCLUDE_FROM_ALL ${ARGN})
     target_link_libraries(${target} ${${type_upper}_LIBRARIES})
     if(TARGET tests)
       add_dependencies(tests ${target})
     endif()
-    add_rostest(${launch_file} DEPENDENCIES ${target})
+    # pass saved parameters to add_rostest, only WORKING_DIRECTORY needs to be checked. ARGS is a list and can be empty
+    if("${_rostest_gtest_WORKING_DIRECTORY}" STREQUAL "")
+      add_rostest(${launch_file} ARGS ${_rostest_gtest_ARGS})
+    else()
+      add_rostest(${launch_file} DEPENDENCIES ${target} WORKING_DIRECTORY ${_rostest_gtest_WORKING_DIRECTORY} ARGS ${_rostest_gtest_ARGS})
+    endif()
   endif()
 endfunction()
 
