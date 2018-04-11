@@ -81,7 +81,7 @@ function(_add_rostest_google_test type target launch_file)
     set(FILES_TO_ADD ${_rostest_gtest_UNPARSED_ARGUMENTS})
     # compile gtest
     include_directories(${${type_upper}_INCLUDE_DIRS})
-    add_executable(${target} EXCLUDE_FROM_ALL ${ARGN})
+    add_executable(${target} EXCLUDE_FROM_ALL ${FILES_TO_ADD})
     target_link_libraries(${target} ${${type_upper}_LIBRARIES})
     if(TARGET tests)
       add_dependencies(tests ${target})
